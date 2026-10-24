@@ -1,6 +1,0 @@
-Validation source: ps5-linux-loader-main(1).zip
-Original archive files checked: 75
-Missing original files: 0
-Changed original files: 0
-Added project files: Plymouth Ali theme, installer/rollback scripts, build-check.sh, Arabic guide and patch notes.
-No original project files were modified.
