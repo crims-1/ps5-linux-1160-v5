@@ -1,56 +1,17 @@
-# دليل Ali Edition v5 — مبني على المصدر الأصلي
+# PS5 Linux Loader v5 — Build Guide
 
-هذه الحزمة مبنية على الأرشيف الأصلي `ps5-linux-loader-main` الذي رفعه المستخدم. لم تُنسخ إليها تعديلات Claude على `source/utils.c` أو `source/loader.c`، ولم تُغيّر ملفات C الأصلية أو ملفات offsets أو الـ shellcode. الإضافة الأساسية هي ثيم Plymouth اختياري باسم **ALI / علي** ودليل تثبيت/تراجع منفصل.
+This guide describes the build process and optional Plymouth boot theme for this project.
 
-## 1. البناء على WSL/Ubuntu
+## Scope
 
-تأكد أن Prospero Payload SDK موجود في المسار `/opt/ps5-payload-sdk/bin/prospero-clang` كما في بيئة المستخدم. ثم من مجلد المشروع نفّذ:
+- Build instructions are provided for a compatible Linux/WSL environment.
+- The optional Plymouth theme changes the Linux boot splash appearance only.
+- A successful build does not guarantee that the payload will run correctly on a PS5.
+- Hardware and firmware compatibility must be verified through appropriate testing.
 
-```bash
-make clean
-make -j1
-```
+## Important Notes
 
-أو استخدم أداة الفحص المساعدة:
-
-```bash
-bash ./build-check.sh
-```
-
-عند النجاح يتوقع أن يظهر الملف `bin/ps5-linux-loader.elf`. هذا يثبت نجاح التجميع فقط، وليس صحة التشغيل على جهاز حقيقي. لا تشغّل الملف على PS5 لمجرد أن البناء نجح.
-
-## 2. شاشة الإقلاع المخصصة
-
-المجلد `plymouth/` يحتوي على ثيم اختياري يرسم خلفية زرقاء داكنة واسم **ALI / علي** وشريط تقدم ورسائل Plymouth. تمت إضافة تسجيل callbacks الخاصة بالتقدم والرسائل حتى لا تبقى نسبة التقدم ثابتة. هذه ميزة شكلية مستقلة عن منطق الـ payload.
-
-لا تثبّت الثيم من WSL. يجب تشغيل المثبّت داخل نسخة Ubuntu/Debian المستهدفة بعد الإقلاع إلى Linux على PS5:
-
-```bash
-cd /path/to/ps5-linux-ali-edition-v5/plymouth
-sudo bash ./install.sh
-```
-
-سيطلب منك تأكيدًا، ويحفظ نسخة احتياطية للثيم الافتراضي، ثم يحدّث initramfs. لن يغيّر `cmdline.txt` أو ملفات payload.
-
-للتراجع داخل Linux المستهدف:
-
-```bash
-sudo bash ./rollback.sh
-```
-
-## 3. إظهار الثيم أثناء الإقلاع
-
-بعض إعدادات الإقلاع تحتاج إلى كلمة `splash` داخل ملف `cmdline.txt` الموجود في قسم الإقلاع FAT32. إذا قررت تفعيلها، احتفظ بنسخة من الملف أولًا وأضف الكلمة إلى السطر الحالي فقط؛ لا تستبدل السطر كاملًا ولا تضف خيارات GPU/PCI عشوائية. لا تُعد إضافة `video=DP-1:1920x1080@60`؛ فقد سبّب سابقًا شاشة سوداء لدى المستخدم. إذا ظهرت شاشة سوداء بعد تفعيل `splash`، أزل الكلمة من نسخة احتياطية/ملف الإقلاع ثم جرّب الإقلاع مجددًا.
-
-## 4. ما لم يتم تغييره
-
-- لم يُعدّل `source/*.c` أو `include/*.h` في هذه الحزمة عن المصدر الأصلي.
-- لم تُضاف عناوين kernel أو Hypervisor أو offsets جديدة.
-- لم تُغيّر قيمة `vram.txt` أو تنشأ قيمة `cmdline.txt` بديلة.
-- لم يتم الادعاء بأن ELF اختُبر على PS5 فعلي. يحتاج اختبار البناء والتشغيل في بيئة المستخدم.
-
-## 5. ملاحظات
-
-- تحذيرات linker مثل `LOAD segment with RWX permissions` ليست بحد ذاتها خطأ بناء، لكنها تظل تحذيرات أمنية/تصميمية تستحق المراجعة.
-- شاشة Plymouth لا تغيّر شعار PlayStation الأولي؛ تظهر عندما يبدأ Linux وPlymouth بالعمل.
-- احتفظ بالنسخة التي اشتغلت عندك في مكان منفصل. هذا الأرشيف نسخة اختبار مستقلة.
+- Do not claim compatibility with a firmware version unless it has been verified.
+- Back up configuration files before making changes.
+- Keep original project files and required build dependencies intact.
+- Review all scripts before running them with administrator privileges.
