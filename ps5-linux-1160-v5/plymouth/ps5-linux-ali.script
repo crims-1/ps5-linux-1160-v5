@@ -1,0 +1,74 @@
+# PS5 Linux — Ali Edition
+# Presentation-only Plymouth theme. This does not alter the PS5 payload.
+
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
+
+# Scale a static background to the active display size.
+background = Image("background.png");
+background_scaled = background.Scale(screen_w, screen_h);
+background_sprite = Sprite();
+background_sprite.SetImage(background_scaled);
+background_sprite.SetX(0);
+background_sprite.SetY(0);
+background_sprite.SetZ(-100);
+
+fun MakeRect(w, h, r, g, b, a) {
+  if (w < 1) w = 1;
+  if (h < 1) h = 1;
+  image = Image(w, h);
+  image.Fill(r, g, b, a);
+  return image;
+}
+
+# Progress overlay matches the track drawn in background.png (25%-75% width).
+PB_X = Math.Int(screen_w * 0.25);
+PB_W = Math.Int(screen_w * 0.50);
+PB_Y = Math.Int(screen_h * 0.75);
+PB_H = Math.Int(screen_h * 0.009);
+if (PB_H < 5) PB_H = 5;
+
+progress_sprite = Sprite();
+progress_sprite.SetImage(MakeRect(1, PB_H, 0.02, 0.58, 1.0, 1.0));
+progress_sprite.SetX(PB_X + 3);
+progress_sprite.SetY(PB_Y + 2);
+progress_sprite.SetZ(10);
+progress_sprite.SetOpacity(0);
+
+percent_sprite = Sprite();
+percent_sprite.SetZ(11);
+percent_sprite.SetY(PB_Y - Math.Int(screen_h * 0.012));
+
+message_sprite = Sprite();
+message_sprite.SetZ(11);
+message_sprite.SetY(PB_Y + Math.Int(screen_h * 0.025));
+
+fun progress_callback(duration, progress) {
+  # Clamp values defensively; boot event values should be in [0, 1].
+  if (progress < 0.0) progress = 0.0;
+  if (progress > 1.0) progress = 1.0;
+
+  fill_w = Math.Int((PB_W - 6) * progress);
+  if (fill_w < 1) fill_w = 1;
+  progress_sprite.SetImage(MakeRect(fill_w, PB_H - 4, 0.02, 0.58, 1.0, 1.0));
+  progress_sprite.SetX(PB_X + 3);
+  progress_sprite.SetY(PB_Y + 2);
+  if (progress <= 0.0) progress_sprite.SetOpacity(0);
+  else progress_sprite.SetOpacity(1);
+
+  pct = Math.Int(progress * 100);
+  pct_image = Image.Text(pct + "%", 0.15, 0.78, 1.0, 1.0,
+                         "DejaVu Sans Mono 14");
+  percent_sprite.SetImage(pct_image);
+  percent_sprite.SetX(PB_X + PB_W + Math.Int(screen_w * 0.012));
+}
+
+fun message_callback(text) {
+  message_image = Image.Text(text, 0.62, 0.78, 0.94, 0.95,
+                             "DejaVu Sans Mono 13");
+  message_sprite.SetImage(message_image);
+  message_sprite.SetX((screen_w - message_image.GetWidth()) / 2);
+}
+
+Plymouth.SetBootProgressFunction(progress_callback);
+Plymouth.SetMessageFunction(message_callback);

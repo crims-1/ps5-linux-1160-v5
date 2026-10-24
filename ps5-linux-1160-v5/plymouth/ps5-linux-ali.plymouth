@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=PS5 Linux — Ali Edition
+Description=Custom PS5 Linux boot splash for Ali
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/ps5-linux-ali
+ScriptFile=/usr/share/plymouth/themes/ps5-linux-ali/ps5-linux-ali.script
